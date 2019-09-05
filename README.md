@@ -3,8 +3,8 @@
 Skeletal usage example:
 
 ```c++
-{
 #include "gifanim.h"
+{
 GifAnim ganim;
 GifWriter g;
 	// Set up filename,
