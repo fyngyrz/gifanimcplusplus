@@ -1,4 +1,4 @@
-# gifanim.cpp and gifanim.cpp
+# gifanim.cpp and gifanim.h
 
 This c++ class has been derived from Charlie Tangora's Public
 domain "gif.h" project, which you can find
