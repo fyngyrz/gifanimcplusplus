@@ -2,7 +2,9 @@
 
 This c++ class has been derived from Charlie Tangora's Public
 domain "gif.h" project, which you can find
-[here.](https://github.com/charlietangora/gif-h)
+[here.](https://github.com/charlietangora/gif-h) In that spirit,
+this is also PD. More of this, less of requiring people to do,
+or not do, this or that. :)
 
 Skeletal usage example:
 
