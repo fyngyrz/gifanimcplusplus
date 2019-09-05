@@ -6,10 +6,13 @@ domain "gif.h" project, which you can find
 this is also [public domain](LICENSE). More of this, less of
 requiring people to do, or not do, this or that. :)
 
-Basically, you prepare a series of 32-bit (4 RGBA bytes per pixel) images
+Basically, you prepare a series of 32-bit (4
+<abbr title="Red, Green, Blue, Alpha">RGBA</abbr>
+bytes per pixel) images
 arranged as rows going from the top of the image to the bottom. The A (alpha)
-channel is ignored, but must be there anyway. Each of the RGBA channels is
-one byte, with a range of 0 (dark) to 255 (light.)
+channel is ignored, but must be there anyway. Each of the
+<abbr title="Red, Green, Blue, Alpha">RGBA</abbr>
+channels is one byte, with a range of 0 (dark) to 255 (light.)
 
 After the setup as explained below, you pass each image to `GifWriteFrame()`
 and when they've all been submitted, you call `GifEnd()`.`
@@ -45,7 +48,7 @@ GifWriter g;
 ```
 
 My fervent thanks to Charlie Tangora for his
-[original PD c implementation;](https://github.com/charlietangora/gif-h)
+[original public domain c implementation;](https://github.com/charlietangora/gif-h)
 he saved me a ton of work on my
 [iToolBox Project](http://ourtimelines.com/itdoc/intro.html). Converting
 his c to a solid c++ class wasn't bad at all; figuring out GIF... _that_
