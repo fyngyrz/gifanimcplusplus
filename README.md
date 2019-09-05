@@ -1,5 +1,9 @@
 # gifanim.cpp and gifanim.cpp
 
+This c++ class has been derived from Charlie Tangora's Public
+domain "gif.h" project, which you can find
+[here.](https://github.com/charlietangora/gif-h)
+
 Skeletal usage example:
 
 ```c++
