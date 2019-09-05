@@ -43,3 +43,20 @@ GifWriter g;
 	ganim.GifEnd(&g);
 }
 ```
+
+My fervent thanks to Charlie Tangora for his
+[original PD c implementation;](https://github.com/charlietangora/gif-h)
+he saved me a ton of work on my
+[iToolBox Project](http://ourtimelines.com/itdoc/intro.html). Converting
+his c to a solid c++ class wasn't bad at all; figuring out GIF... _that_
+would have been quite the undertaking!
+
+For the record, I'm using this inside a Qt c++ project for OSX, and it
+works great there as-is, although I do use a custom memory manager rather
+than the bare `calloc()` and `free()` used here. Nothing you have to
+worry about, I'm just into firewalling and tracking memory during
+development so as to catch as many problems as possible, as early as
+possible. But because I _do_ use such a memory manager, this code has
+been through rigorous memory behavior validation inside my [iToolBox
+Project,](http://ourtimelines.com/itdoc/intro.html) and I think you can
+confidently trust it to be memory-safe.
