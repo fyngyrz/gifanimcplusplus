@@ -63,5 +63,5 @@ problems as possible, as early as possible. But because I _do_ use such a
 memory manager, this code has been through rigorous memory behavior
 validation inside my
 [iToolBox Project,](http://ourtimelines.com/itdoc/intro.html)
-and so I have good reason to I think you can confidently trust it to be
+and so I have good reason to think you can confidently trust it to be
 memory-safe.
