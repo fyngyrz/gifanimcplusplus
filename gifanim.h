@@ -69,10 +69,12 @@ public:
 	void GifWritePalette( const GifPalette* pPal, FILE* f );
 	void GifWriteLzwImage(FILE* f, uint8_t* image, uint32_t left, uint32_t top,  uint32_t width, uint32_t height, uint32_t delay, GifPalette* pPal);
 	bool GifBegin( GifWriter* writer, const char* filename, uint32_t width, uint32_t height, uint32_t delay, int loopcount = 0, int32_t bitDepth = 8, bool dither = false);
-	bool GifWriteFrame( GifWriter* writer, const uint8_t* image, uint32_t width, uint32_t height, uint32_t delay, int bitDepth = 8, bool dither = false );
+	bool GifWriteFrame( GifWriter* writer, const uint8_t* image, uint32_t width, uint32_t height, uint32_t delay, int bitDepth = 8, bool dither = false, GifPalette *p = NULL);
 	bool GifEnd( GifWriter* writer );
 
 	const int kGifTransIndex = 0;
+	bool havePalette;
+	GifPalette *have;
 };
 
 #endif // GIFANIM_H

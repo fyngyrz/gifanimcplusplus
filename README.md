@@ -14,6 +14,22 @@ channel is ignored, but must be there anyway. Each of the
 <abbr title="Red, Green, Blue, Alpha">RGBA</abbr>
 channels is one byte, with a range of 0 (dark) to 255 (light.)
 
+This class can do color selection for you, but there are better color
+selectors out there. If you have such a better color selector, then:
+
+1) Pre-select a GifPalette for each image you provide and supply it to
+GIFWriteFrame along with the image
+
+2) Pre-reduce each image to just those 24-bit colors that are contained
+in the palette you're supplying.
+
+This will bypass all of the palette selection code in this class.
+
+**You can't mix the two approaches: either you supply a pre-selected
+palette for every frame where each image contains _only_ those colors, or
+you don't supply a palette and the image can be any set of 24-bit
+colors.**
+
 After the setup as explained below, you pass each image to `GifWriteFrame()`
 and when they've all been submitted, you call `GifEnd()`.`
 

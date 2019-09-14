@@ -47,6 +47,7 @@
 
 GifAnim::GifAnim()
 {
+	havePalette = false;
 }
 
 // max, min, and abs functions
@@ -493,9 +494,43 @@ void GifAnim::GifDitherImage( const uint8_t* lastFrame, const uint8_t* nextFrame
 
 // Picks palette colors for the image using simple thresholding, no dithering
 // --------------------------------------------------------------------------
-void GifAnim::GifThresholdImage( const uint8_t* lastFrame, const uint8_t* nextFrame, uint8_t* outFrame, uint32_t width, uint32_t height, GifPalette* pPal )
+void GifAnim::GifThresholdImage( const uint8_t* lastFrame,
+								 const uint8_t* nextFrame,
+								 uint8_t* outFrame,
+								 uint32_t width,
+								 uint32_t height,
+								 GifPalette* pPal )
 {
+uint8_t pindex;
+uint16_t pi;
+
 	uint32_t numPixels = width*height;
+	if (havePalette == true) // if palette was picked already
+	{
+		for (uint32_t ii=0; ii<numPixels; ++ii )
+		{
+			// find exact match
+			pindex = 1; // in case it's not there... which would be bad
+			for (pi=0; pi<256; pi++) // linear search... it's slow, optimize later
+			{
+				if (nextFrame[0] == have->r[pi])
+				{
+					if (nextFrame[1] == have->g[pi])
+					{
+						if (nextFrame[2] == have->b[pi])
+						{
+							pindex = pi;
+							pi = 256; // found
+						}
+					}
+				}
+			}
+			outFrame[3] = pindex;
+			outFrame += 4;
+			nextFrame += 4;
+		}
+		return;
+	}
 	for( uint32_t ii=0; ii<numPixels; ++ii )
 	{
 		// if a previous color is available, and it matches
@@ -583,19 +618,35 @@ void GifAnim::GifWriteCode( FILE* f, GifBitStatus& stat, uint32_t code, uint32_t
 // ---------------------------------------------------
 void GifAnim::GifWritePalette( const GifPalette* pPal, FILE* f )
 {
-	fputc(0, f);  // first color: transparency
-	fputc(0, f);
-	fputc(0, f);
-
-	for(int ii=1; ii<(1 << pPal->bitDepth); ++ii)
+	if (havePalette)
 	{
-		uint32_t r = pPal->r[ii];
-		uint32_t g = pPal->g[ii];
-		uint32_t b = pPal->b[ii];
+		for(int ii=0; ii<(1 << pPal->bitDepth); ++ii)
+		{
+			uint32_t r = pPal->r[ii];
+			uint32_t g = pPal->g[ii];
+			uint32_t b = pPal->b[ii];
 
-		fputc((int)r, f);
-		fputc((int)g, f);
-		fputc((int)b, f);
+			fputc((int)r, f);
+			fputc((int)g, f);
+			fputc((int)b, f);
+		}
+	}
+	else
+	{
+		fputc(0, f);  // first color: transparency
+		fputc(0, f);
+		fputc(0, f);
+
+		for(int ii=1; ii<(1 << pPal->bitDepth); ++ii)
+		{
+			uint32_t r = pPal->r[ii];
+			uint32_t g = pPal->g[ii];
+			uint32_t b = pPal->b[ii];
+
+			fputc((int)r, f);
+			fputc((int)g, f);
+			fputc((int)b, f);
+		}
 	}
 }
 
@@ -608,7 +659,14 @@ void GifAnim::GifWriteLzwImage(FILE* f, uint8_t* image, uint32_t left, uint32_t 
 	fputc(0x21, f);
 	fputc(0xf9, f);
 	fputc(0x04, f);
-	fputc(0x05, f);						// leave prev frame in place, this frame has transparency
+	if (havePalette)
+	{
+		fputc(0x00, f);		// no transparency
+	}
+	else
+	{
+		fputc(0x05, f);		// leave prev frame in place, this frame has transparency
+	}
 	fputc(delay & 0xff, f);
 	fputc((delay >> 8) & 0xff, f);
 	fputc(kGifTransIndex, f);			// transparent color index
@@ -792,21 +850,47 @@ bool GifAnim::GifBegin( GifWriter* writer, const char* filename, uint32_t width,
 // to use different bit depths for different frames of an
 // image - this may be handy to save bits in animations that
 // don't change much.
+//
+// Now renders frames without modification that have:
+//	a: been pre-rendered down into 256 colors, and...
+//	b: are supplied with a GifPalette structure which
+//	   has a precisely matching palette for all the
+//	   colors in the frame. If there are colors in the
+//	   frame that do not match, the render will be off.
+//
+//	   To use this capability, pre-render your frame
+//	   and supply the appropriate palette. Otherwise
+//	   parameter "p" should be NULL, and the animator
+//	   will do its best to pick appropriate palettes.
+//
+//	   Note that these fames are still 24-bit RGB, not
+//     palette indexes. The indexing is done here.
+//
+//	   Don't mix the two techniques. Either pre-render
+//	   all the frames, or don't pre-render any of them.
 // ----------------------------------------------------------
-bool GifAnim::GifWriteFrame( GifWriter* writer, const uint8_t* image, uint32_t width, uint32_t height, uint32_t delay, int bitDepth, bool dither )
+bool GifAnim::GifWriteFrame( GifWriter* writer, const uint8_t* image, uint32_t width, uint32_t height, uint32_t delay, int bitDepth, bool dither, GifPalette *p )
 {
 	if(!writer->f) return false;
-
+	have = p;
+	if (p == NULL)	havePalette = false;
+	else			havePalette = true;
 	const uint8_t* oldImage = writer->firstFrame? NULL : writer->oldImage;
 	writer->firstFrame = false;
 
 	GifPalette pal;
-	GifMakePalette((dither? NULL : oldImage), image, width, height, bitDepth, dither, &pal);
+	if (havePalette == false)
+	{
+		GifMakePalette((dither? NULL : oldImage), image, width, height, bitDepth, dither, &pal);
 
-	if(dither)
-		GifDitherImage(oldImage, image, writer->oldImage, width, height, &pal);
-	else
-		GifThresholdImage(oldImage, image, writer->oldImage, width, height, &pal);
+		if(dither)	GifDitherImage(oldImage, image, writer->oldImage, width, height, &pal);
+		else		GifThresholdImage(oldImage, image, writer->oldImage, width, height, &pal);
+	}
+	else // we do have a palette
+	{
+		pal = *p; // copy it in
+		GifThresholdImage(image,image,writer->oldImage,width,height,&pal);
+	}
 
 	GifWriteLzwImage(writer->f, writer->oldImage, 0, 0, width, height, delay, &pal);
 
