@@ -70,7 +70,7 @@ he saved me a ton of work on my
 his c to a solid c++ class wasn't bad at all; figuring out GIF... _that_
 would have been quite the undertaking!
 
-For the record, I'm using this class exactly as p[rovided here inside a
+For the record, I'm using this class exactly as provided here inside a
 Qt c++ project for OS&nbsp;X/MacOS, and it works great there as-is,
 although I do use a custom memory manager rather than the bare `calloc()`
 and `free()` used here. Nothing you have to worry about, I'm just into
