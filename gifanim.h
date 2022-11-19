@@ -3,6 +3,7 @@
 
 #include <stdlib.h>		// for malloc, calloc, free, memcpy, bzero, integer typedefs
 #include <stdio.h>		// for FILE*
+#include <stdint.h>
 
 struct GifPalette
 {

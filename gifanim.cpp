@@ -5,6 +5,7 @@
 // -------------------------------------------------------------
 
 #include "gifanim.h"
+#include <cstring>
 
 // This is my custom memory allocation
 // replacement; You don't need this.
@@ -353,7 +354,7 @@ void GifAnim::GifMakePalette( const uint8_t* lastFrame, const uint8_t* nextFrame
 	// --------------------------------------------------------------
 	size_t imageSize = (size_t)(width * height * 4 * sizeof(uint8_t));
 	uint8_t* destroyableImage = (uint8_t*)GIF_TEMP_MALLOC(imageSize);
-	memcpy(destroyableImage, nextFrame, imageSize);
+	std::memcpy(destroyableImage, nextFrame, imageSize);
 
 	int numPixels = (int)(width * height);
 	if(lastFrame)
